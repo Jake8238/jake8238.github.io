@@ -537,5 +537,6 @@ button:focus {
         height: 3rem;
         bottom: 1.5rem;
         right: 1.5rem;
+        transition: opacity 300ms ease-in;
     }
 }
