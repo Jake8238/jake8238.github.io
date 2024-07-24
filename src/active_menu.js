@@ -18,13 +18,24 @@ const sectionIds = [
   '#testimonial',
   '#contact',
 ];
+
+// const homeSection = document.querySelector('#home');
+// const homeMenu = document.querySelector('[href="#home"]');
+// 이런식으로 하나씩 가져와도 되지만...반복하기 때문에 아래처럼 코딩 map 사용
+
+// intersection callback 함수는 기본적으로 진입했을때, 빠져나갔을 때에만 호출된다.
+
 const sections = sectionIds.map((id) => document.querySelector(id));
 const navItems = sectionIds.map((id) =>
   document.querySelector(`[href="${id}"]`)
 );
 const visibleSections = sectionIds.map(() => false);
+let activeNavItem = navItems[0];
 
-const options = {};
+const options = {
+  rootMargin: '-20% 0px 0px 0px',
+  threshold: [0, 0.98], // 가끔 1일 때 안되서 0.98 쓰기도 함
+};
 const observer = new IntersectionObserver(observerCallback, options);
 sections.forEach((section) => observer.observe(section));
 
@@ -36,18 +47,29 @@ function observerCallback(entries) {
     selectLastOne =
       index === sectionIds.length - 1 &&
       entry.isIntersecting &&
-      entry.intersectionRatio >= 0.99;
+      entry.intersectionRatio >= 0.97;
+    // 3가지 조건이 true가 되면 selectLastOne이 true, 기본은 undefined
   });
   console.log(visibleSections);
   console.log('무조건 라스트 섹션!!', selectLastOne);
 
   const navIndex = selectLastOne
-    ? sectionIds.length - 1
-    : findFirstIntersecting(visibleSections);
+    ? sectionIds.length - 1 // ture면 이거(마지막 섹션)
+    : findFirstIntersecting(visibleSections); // false면, 섹션 찾아라
   console.log(sectionIds[navIndex]);
+  selectNavItem(navIndex);
+}
+
+function selectNavItem(index) {
+  const navItem = navItems[index];
+  if (!navItem) return;
+  activeNavItem.classList.remove('active');
+  activeNavItem = navItem;
+  activeNavItem.classList.add('active');
 }
 
 function findFirstIntersecting(intersections) {
-  const index = intersections.indexOf(true);
+  const index = intersections.indexOf(true); // 첫번째 true 인덱스
   return index >= 0 ? index : 0;
+  // indexOf : 아이템 없으면 -1 반환한다.
 }
